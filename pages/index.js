@@ -10,15 +10,16 @@ import styled from "styled-components"
 const Home = () => {
   let title = `Bulk Upload form`
   const [dataPost, setDataPost] = useState([])
+  const [amountSuccess, setASuccess] = useState()
   const ConvertData = async (csv) => {
     let dataArray = await csvToArray(csv);
     let headers = dataArray[0]
-    console.log('headers', headers)
     const result = dataArray.slice(1).reduce((o, row, i) => {
       const fields = row
       let mapData = {
         amenity: [],
-        status: []
+        status: [],
+        error: false
       }
       headers.map((name, j) => {
         if(['agent_post','accept_agent'].includes(name)){
@@ -26,8 +27,10 @@ const Home = () => {
             mapData.status.push(name)
           }
         }
-        else if(j < 13)
+        else if(j < 13){
           mapData[name] = fields[j] || "not found"
+          if(!fields[j]) mapData.error = true
+        }
         else{
           if(fields[j]){
             mapData.amenity.push(name)
@@ -37,7 +40,8 @@ const Home = () => {
       o.push(mapData)
       return o
     },[])
-    console.log('result',result)
+    const success = result.filter(e => !e.error)
+    setASuccess(success?.length || 0)
     setDataPost(result)
   }
 
@@ -81,11 +85,26 @@ const Home = () => {
           </Upload>
         </Box>
       </Container>
-      <ContentStyle>
-        <TableData
-          rows={dataPost}
-        />
-      </ContentStyle>
+      {
+        dataPost.length &&
+        <>
+        <p>table</p>
+        <ContentStyle>
+          <ResultUpload>
+            <div className="box">
+              <p>
+                {amountSuccess}
+              </p>
+            </div>
+            <h1>listings successfully and Ready to published</h1>
+          </ResultUpload>
+          <TableData
+            rows={dataPost}
+          />
+        </ContentStyle>
+        </>
+      }
+      
       
     </>
   )
@@ -108,6 +127,36 @@ const csvToArray = (text) => {
   }
   return ret;
 }
+
+const ResultUpload = styled.div`
+  display: flex;
+  width: 1920px;
+  height: 88px;
+  left: 0px;
+  top: 0px;
+
+  /* bg card */
+
+  background: #FFFFFF;
+  /* Border */
+
+  border: 0.5px solid #E5E5E5;
+  box-sizing: border-box;
+  div.box{
+    background: #F3F5F8;
+    width: 83px;
+    height: 88px;
+    display: flex;
+  }
+  div.box > p{
+    font-size: 24px;
+    color: #002240;
+    margin: auto;
+  }
+  h1{
+    margin: auto 1vw;
+  }
+`
 const ButtonUpload = styled(Button)`
   width: 643px;
   height: 104px;

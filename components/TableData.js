@@ -2,7 +2,7 @@
 import { Layout, Card, Upload, message, Badge, Table, Popover } from "antd"
 import { InboxOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { useState, useEffect } from "react"
-
+import styled from "styled-components"
 
 const TableData = (props) => {
   const [rows, setRows ] = useState(props?.rows)
@@ -15,7 +15,12 @@ const TableData = (props) => {
       //   return <p className="column"></p>
       // },
       dataIndex: 'id',
-      width: 50
+      width: 50,
+      // render: (id) => (
+      //   <div >
+
+      //   </div>
+      // )
     },
     {
       // title: () => { 
@@ -29,36 +34,51 @@ const TableData = (props) => {
       // title: () => { 
       //   return <p className="column">RENT PRICE(Baht)</p>
       // },
-      title: 'RENT PRICE(Baht)',
+      title: 'RENT PRICE (Baht)',
       dataIndex: 'rent_price',
-      ellipsis: true
+      ellipsis: true,
+      render: (rent_price) => (
+        <>{
+          rent_price !== "0" ?
+          <p> {rent_price} <span style={{color: "#A6AAB4"}}>/month</span></p>
+          : ""
+        }</>
+      )
     },
     {
-      title: 'SELL PRICE(Baht)',
+      title: 'SELL PRICE (Baht)',
       dataIndex: 'sale_price',
-      ellipsis: true
+      ellipsis: true,
+      render: (sale_price) => (
+        <>{
+          sale_price !== "0"  ?
+          <p> {sale_price}</p>
+          : ""
+        }</>
+      )
     },
     {
       title: 'BEDROOM',
       dataIndex: 'bedroom',
-      width: 100,
+      width: 80,
       ellipsis: true
     },
     {
       title: 'BATHROOM',
       dataIndex: 'bath',
-      width: 100,
+      width: 80,
       ellipsis: true
     },
     {
-      title: 'SIZE(sqm.)',
+      title: 'SIZE (sqm.)',
       dataIndex: 'size (sq.m)',
+      width: 80,
       ellipsis: true
     },
     {
       title: 'FLOOR',
       dataIndex: 'floor',
-      width: 100,
+      width: 80,
       ellipsis: true
     },
     {
@@ -67,18 +87,16 @@ const TableData = (props) => {
       width: 300,
       ellipsis: true,
       render: (status) => (
+        <div style={{ display: "flex"}}>{
         status.map((item) => (
-          <div style={{
-            background: item === 'agent_post'? "rgba(111, 207, 151, 0.24)" 
-            : "rgba(243, 208, 83, 0.28)",
-            borderRadius: "20px",
-            width: "5vw",
-            padding: "0 10px"
-          }}>
-            <p style={{ color: item === 'agent_post'? "#6FCF97" 
+          <BadgeStatus
+            bg={item === 'agent_post'? "rgba(111, 207, 151, 0.24)" : "rgba(243, 208, 83, 0.28)"}
+          >
+            <p style={{ textAlign: "center",color: item === 'agent_post'? "#6FCF97" 
                 : "#F2C94C"}} > {item === 'agent_post'? "Agent post" : "รับ Co Agent"}</p>
-          </div>
+          </BadgeStatus>
         ))
+        }</div>
       ),
     },
     {
@@ -86,7 +104,7 @@ const TableData = (props) => {
       dataIndex: 'photo1',
       ellipsis: true,
       render: photo => (
-        <img src={photo || "/icons/man.png"} width="35px" />
+        <img src={photo || "/icons/mockImage.png"} width="24px"  />
       )
     },
     {
@@ -108,6 +126,7 @@ const TableData = (props) => {
       title: 'Amenities',
       dataIndex: 'amenity',
       ellipsis: true,
+      width: 80,
       render: amenity => (
         <Popover placement="bottomRight" content={
           <div>
@@ -119,9 +138,12 @@ const TableData = (props) => {
            
           </div>
         } title="Amenities" trigger="hover">
-          {/* <p>{amenity.length}</p> */}
-          {amenity.length}
-          <CaretDownOutlined />
+          <div>
+            <p style={{position: "absolute"}}>{amenity.length}</p>
+            {/* {amenity.length} */}
+            <CaretDownOutlined  style={{margin: "0.3vw 0 0 2vw"}}/>
+          </div>
+          
         </Popover>
       ),
     },
@@ -138,4 +160,11 @@ const TableData = (props) => {
   )
 }
 
+const BadgeStatus = styled.div`
+  background: ${props => props.bg || rgba(243, 208, 83, 0.28)};
+  border-radius: 20px;
+  width: 5vw;
+  padding: 0 5px;
+  height: 4vh;
+`
 export default TableData
