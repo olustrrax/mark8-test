@@ -19,7 +19,6 @@ const Home = () => {
       let mapData = {
         amenity: [],
         status: [],
-        error: false
       }
       headers.map((name, j) => {
         if(['agent_post','accept_agent'].includes(name)){
@@ -29,7 +28,7 @@ const Home = () => {
         }
         else if(j < 13){
           mapData[name] = fields[j] || "not found"
-          if(!fields[j]) mapData.error = true
+          if(!fields[j]) mapData.id += 'error'
         }
         else{
           if(fields[j]){
@@ -87,8 +86,6 @@ const Home = () => {
       </Container>
       {
         dataPost.length &&
-        <>
-        <p>table</p>
         <ContentStyle>
           <ResultUpload>
             <div className="box">
@@ -102,10 +99,7 @@ const Home = () => {
             rows={dataPost}
           />
         </ContentStyle>
-        </>
       }
-      
-      
     </>
   )
 }

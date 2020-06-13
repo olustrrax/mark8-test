@@ -11,34 +11,33 @@ const TableData = (props) => {
   },[props?.rows])
   const columns = [
     {
-      // title: () => { 
-      //   return <p className="column"></p>
-      // },
       dataIndex: 'id',
       width: 50,
-      // render: (id) => (
-      //   <div >
-
-      //   </div>
-      // )
+      render: (id) => (
+          id.match('error') ? (
+            <BadgeError>
+              <p>{id.replace('error', '')}</p>
+            </BadgeError>
+          ) : id
+      )
     },
     {
-      // title: () => { 
-      //   return <p className="column">CONDO NAME</p>
-      // },
       title: 'CONDO NAME',
       dataIndex: 'condo_name-EN',
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     {
-      // title: () => { 
-      //   return <p className="column">RENT PRICE(Baht)</p>
-      // },
       title: 'RENT PRICE (Baht)',
       dataIndex: 'rent_price',
       ellipsis: true,
       render: (rent_price) => (
         <>{
+          rent_price === 'not found' ?
+          <TextNotfound>{rent_price}</TextNotfound> :
           rent_price !== "0" ?
           <p> {rent_price} <span style={{color: "#A6AAB4"}}>/month</span></p>
           : ""
@@ -61,25 +60,41 @@ const TableData = (props) => {
       title: 'BEDROOM',
       dataIndex: 'bedroom',
       width: 80,
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     {
       title: 'BATHROOM',
       dataIndex: 'bath',
       width: 80,
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     {
       title: 'SIZE (sqm.)',
       dataIndex: 'size (sq.m)',
       width: 80,
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     {
       title: 'FLOOR',
       dataIndex: 'floor',
       width: 80,
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     {
       title: 'STATUS',
@@ -110,12 +125,20 @@ const TableData = (props) => {
     {
       title: 'TITLE',
       dataIndex: 'title',
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     {
       title: 'DESCRIPTION',
       dataIndex: 'description',
-      ellipsis: true
+      ellipsis: true,
+      render: (item) => (
+        item === 'not found' ?
+        <TextNotfound>{item}</TextNotfound> : item
+      )
     },
     // {
     //   title: 'BENEFIT',
@@ -140,7 +163,6 @@ const TableData = (props) => {
         } title="Amenities" trigger="hover">
           <div>
             <p style={{position: "absolute"}}>{amenity.length}</p>
-            {/* {amenity.length} */}
             <CaretDownOutlined  style={{margin: "0.3vw 0 0 2vw"}}/>
           </div>
           
@@ -166,5 +188,22 @@ const BadgeStatus = styled.div`
   width: 5vw;
   padding: 0 5px;
   height: 4vh;
+`
+
+const BadgeError = styled.div`
+  background: #EB5757;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  p{
+    margin: auto;
+    color: #FFFFFF;
+  }
+`
+
+const TextNotfound = styled.p`
+  color: #EB5757;
+  margin: 0;
 `
 export default TableData
