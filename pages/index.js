@@ -1,209 +1,175 @@
 import Head from 'next/head'
+import React from "react"
+import { Layout, Card, Upload, message, Button } from "antd"
+import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
+const { Header, Content } = Layout
+import { useState } from 'react'
+import TableData from "../components/TableData"
+import styled from "styled-components"
 
-export default function Home() {
-  return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
+const Home = () => {
+  let title = `Bulk Upload form`
+  const [dataPost, setDataPost] = useState([])
+  const ConvertData = async (csv) => {
+    let dataArray = await csvToArray(csv);
+    let headers = dataArray[0]
+    console.log('headers', headers)
+    const result = dataArray.slice(1).reduce((o, row, i) => {
+      const fields = row
+      let mapData = {
+        amenity: [],
+        status: []
+      }
+      headers.map((name, j) => {
+        if(['agent_post','accept_agent'].includes(name)){
+          if(fields[j] === "TRUE"){
+            mapData.status.push(name)
           }
         }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
+        else if(j < 13)
+          mapData[name] = fields[j] || "not found"
+        else{
+          if(fields[j]){
+            mapData.amenity.push(name)
+          }
         }
+      })
+      o.push(mapData)
+      return o
+    },[])
+    console.log('result',result)
+    setDataPost(result)
+  }
 
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
+
+  return (
+    <>
+      <Container>
+        <HeaderSyle>
+          <Logo src="/icons/logo.png" />
+        </HeaderSyle>
+        <Box title={title}>
+          <h2>Choose your an input medthod</h2>
+          <Upload 
+            accept=".csv"
+            showUploadList={false}
+            beforeUpload={file => {
+                const reader = new FileReader();
+        
+                reader.onload = e => {
+                    // console.log(e.target.result);
+                    // csvJSON(e.target.result)
+                    ConvertData(e.target.result)
+                };
+                reader.readAsText(file);
+        
+                // Prevent upload
+                return false;
+            }}
+          >
+            <ButtonUpload>
+              <img style={{ margin: "auto 0"}} src="/icons/space_bar.png"></img>
+              <div style={{ width: "100%", margin: "auto 0 auto 1vw", textAlign: "start"}}>
+                <p style={{ fontWeight: 800}} >via CSV file</p>
+                <p>
+                  อัปเดตข้อมูลจากไฟล์ CSV
+                </p>
+              </div>
+            </ButtonUpload>
+
+            
+          </Upload>
+        </Box>
+      </Container>
+      <ContentStyle>
+        <TableData
+          rows={dataPost}
+        />
+      </ContentStyle>
+      
+    </>
   )
 }
+
+export default Home
+
+const csvToArray = (text) => {
+  let p = '', row = [''], ret = [row], i = 0, r = 0, s = true, l;
+  for (l of text) {
+      if ('"' === l) {
+          if (s && l === p) row[i] += l;
+          s = !s;
+      } else if (',' === l && s) l = row[++i] = '';
+      else if ('\n' === l && s) {
+          if ('\r' === p) row[i] = row[i].slice(0, -1);
+          row = ret[++r] = [l = '']; i = 0;
+      } else row[i] += l;
+      p = l;
+  }
+  return ret;
+}
+const ButtonUpload = styled(Button)`
+  width: 643px;
+  height: 104px;
+  left: 0px;
+  top: 44px;
+
+  /* bg card */
+
+  background: #FFFFFF;
+  /* Border */
+  display: flex;
+  border: 1px solid #E5E5E5;
+  box-sizing: border-box;
+  border-radius: 6px;
+`
+const ContentStyle = styled.div`
+  width: 1920px;
+  height: 88px;
+  top: 0px;
+  margin: 2vw 0;
+  /* bg card */
+
+  background: #FFFFFF;
+  /* Border */
+
+  border: 0.5px solid #E5E5E5;
+  box-sizing: border-box;
+`
+const Box = styled(Card)`
+  width: 1019px;
+  height: 296px;
+  // left: 448px;
+  // top: 120px;
+  // position: absolute;
+  margin: auto;
+  /* bg card */
+
+  background: #FFFFFF;
+  /* Border */
+
+  border: 1px solid #E5E5E5;
+  box-sizing: border-box;
+  border-radius: 6px;
+`
+
+const Container = styled.div`
+  min-height: 10vh;
+  margin-top: 120px;
+`
+const HeaderSyle = styled(Header)`
+  width: 100%;
+  height: 56px;
+  background: #002240;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+`
+
+const Logo = styled.img`
+  position: absolute;
+  width: 90px;
+  height: 31.76px;
+  left: 448px;
+  top: 12.18px;
+`
