@@ -1,8 +1,7 @@
-import Head from 'next/head'
 import React from "react"
-import { Layout, Card, Upload, message, Button } from "antd"
-import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
-const { Header, Content } = Layout
+import { Layout, Card, Upload, Col, Button } from "antd"
+import { InboxOutlined,ExclamationCircleFilled } from '@ant-design/icons';
+const { Header } = Layout
 import { useState } from 'react'
 import TableData from "../components/TableData"
 import styled from "styled-components"
@@ -11,6 +10,7 @@ const Home = () => {
   let title = `Bulk Upload form`
   const [dataPost, setDataPost] = useState([])
   const [amountSuccess, setASuccess] = useState()
+  const [dataInvalid, setDataInvalid] = useState("")
   const ConvertData = async (csv) => {
     let dataArray = await csvToArray(csv);
     let headers = dataArray[0]
@@ -28,7 +28,7 @@ const Home = () => {
         }
         else if(j < 13){
           mapData[name] = fields[j] || "not found"
-          if(!fields[j]) mapData.id += 'error'
+          if(!fields[j] && !mapData.id.match('error')) mapData.id += 'error'
         }
         else{
           if(fields[j]){
@@ -39,9 +39,11 @@ const Home = () => {
       o.push(mapData)
       return o
     },[])
-    const success = result.filter(e => !e.error)
+    const success = result.filter(e => !e.id?.match('error'))
     setASuccess(success?.length || 0)
     setDataPost(result)
+    if(success?.length !== result.length) setDataInvalid("You haven’t upload any bulk data yet")
+    else setDataInvalid("")
   }
 
 
@@ -51,23 +53,24 @@ const Home = () => {
         <HeaderSyle>
           <Logo src="/icons/logo.png" />
         </HeaderSyle>
-        <Box title={title}>
+        <Box title={
+          <>
+            <h2>{title} {dataInvalid? <ExclamationCircleFilled style={{ fontSize: '20px', color: "#0089FF"}} /> : "" }</h2>
+            <p style={{ color: "#0089FF", margin: 0}}>{dataInvalid}</p>
+          </>
+        }>
           <h2>Choose your an input medthod</h2>
           <Upload 
             accept=".csv"
             showUploadList={false}
             beforeUpload={file => {
-                const reader = new FileReader();
-        
-                reader.onload = e => {
-                    // console.log(e.target.result);
-                    // csvJSON(e.target.result)
-                    ConvertData(e.target.result)
-                };
-                reader.readAsText(file);
-        
-                // Prevent upload
-                return false;
+              const reader = new FileReader();
+              reader.onload = e => {
+                ConvertData(e.target.result)
+              };
+              reader.readAsText(file);
+              // Prevent upload
+              return false;
             }}
           >
             <ButtonUpload>
@@ -79,8 +82,6 @@ const Home = () => {
                 </p>
               </div>
             </ButtonUpload>
-
-            
           </Upload>
         </Box>
       </Container>
@@ -94,6 +95,17 @@ const Home = () => {
               </p>
             </div>
             <h1>listings successfully and Ready to published</h1>
+            <div style={{ justifyContent: "flex-end", width: "70%", }}>
+              {/* <Col> */}
+                <img style={{}} src="/icons/update.png"/> <p style={{color: "#0089FF"}}>Update data</p>
+              {/* </Col> */}
+              {/* <Col> */}
+              <img src="/icons/open_in_browser.png" />
+              {/* </Col> */}
+              {/* <Col> */}
+              <p style={{color: "#A6AAB4"}}>Published</p>
+              {/* </Col> */}
+            </div>
           </ResultUpload>
           <TableData
             rows={dataPost}
@@ -147,6 +159,13 @@ const ResultUpload = styled.div`
     color: #002240;
     margin: auto;
   }
+  div > img {
+    width: 20px;
+    height: 20px;
+    margin: 1.8vw 2vw;
+    right: 20vw;
+    position: absolute;
+  }
   h1{
     margin: auto 1vw;
   }
@@ -155,7 +174,6 @@ const ButtonUpload = styled(Button)`
   width: 643px;
   height: 104px;
   left: 0px;
-  top: 44px;
 
   /* bg card */
 
@@ -182,9 +200,6 @@ const ContentStyle = styled.div`
 const Box = styled(Card)`
   width: 1019px;
   height: 296px;
-  // left: 448px;
-  // top: 120px;
-  // position: absolute;
   margin: auto;
   /* bg card */
 
@@ -194,6 +209,9 @@ const Box = styled(Card)`
   border: 1px solid #E5E5E5;
   box-sizing: border-box;
   border-radius: 6px;
+  .ant-card-body {
+    padding: 20px 24px;
+  }
 `
 
 const Container = styled.div`
