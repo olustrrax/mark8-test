@@ -119,19 +119,24 @@ const Home = () => {
 export default Home
 
 const csvToArray = (text) => {
-  let p = '', row = [''], ret = [row], i = 0, r = 0, s = true, l;
-  for (l of text) {
-      if ('"' === l) {
-          if (s && l === p) row[i] += l;
-          s = !s;
-      } else if (',' === l && s) l = row[++i] = '';
-      else if ('\n' === l && s) {
-          if ('\r' === p) row[i] = row[i].slice(0, -1);
-          row = ret[++r] = [l = '']; i = 0;
-      } else row[i] += l;
-      p = l;
+  let row = [], c = 0, i=0; ans = '', res = [];
+  for(d of text){
+    if(d ===',' && !c){
+      row.push(ans)
+      ans = d = ''
+    }
+    else if(d==='"'){
+      if(!c) c = 1; else c = 0
+      d = ''
+    }
+    if((text[++i] === undefined || '\n' === d || '\r' === d ) && !c ){
+      row.push(ans)
+      res.push(row)
+      d = ans=''; row =[]; c = 0
+    } 
+    ans+=d
   }
-  return ret;
+  return res
 }
 
 const ResultUpload = styled.div`
