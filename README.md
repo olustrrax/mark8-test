@@ -6,7 +6,7 @@ First, run the development server:
 
 ### Preparation
 ```bash
-node version above 10
+node 11
 ```
 
 ### Installation
