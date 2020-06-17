@@ -6,6 +6,29 @@ import { useState } from 'react'
 import TableData from "../components/TableData"
 import styled from "styled-components"
 import axios from 'axios'
+
+const csvToArray = (text) => {
+  let row = [], c = 0, i=0, ans = '', res = [];
+  for(let d of text){
+    if(d ===',' && !c){
+      row.push(ans)
+      ans = d = '';
+    }
+    else if(d==='"'){
+      if(!c) c = 1; else c = 0;
+      d = '';
+    }
+    else if((++i === text.length || '\n' === d || '\r' === d ) && !c && row.length){
+      row.push(ans); res.push(row);
+      d = ans ='';
+      row = []; c = 0;
+    } 
+    ans+=d;
+  }
+  res.push(row)
+  return res
+}
+
 const Home = () => {
   let title = `Bulk Upload form`
   let [dataPost, setDataPost] = useState([])
@@ -141,28 +164,6 @@ const Home = () => {
 }
 
 export default Home
-
-const csvToArray = (text) => {
-  let row = [], c = 0, i=0, ans = '', res = [];
-  for(let d of text){
-    if(d ===',' && !c){
-      row.push(ans)
-      ans = d = '';
-    }
-    else if(d==='"'){
-      if(!c) c = 1; else c = 0;
-      d = '';
-    }
-    else if((++i === text.length || '\n' === d || '\r' === d ) && !c && row.length){
-      row.push(ans); res.push(row);
-      d = ans ='';
-      row = []; c = 0;
-    } 
-    ans+=d;
-  }
-  res.push(row)
-  return res
-}
 
 const ResultUpload = styled.div`
   display: flex;

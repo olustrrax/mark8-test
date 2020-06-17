@@ -21,7 +21,7 @@ const upload = multer({
     fileSize: 10000000
   },
   fileFilter: async (req,file, cb) => {
-    fs.mkdir(__dirname+'public/upload', { recursive: true }, (err) => { if (err) throw err; });
+    fs.mkdir(__dirname+'/public/upload', { recursive: true }, (err) => { if (err) throw err; });
     if (!(file && file.mimetype && file.mimetype.includes("image"))) {
       return cb(new Error("กรุณาอัพโหลดไฟล์ jpg, jpeg, png เท่านั้น"), false)
     }
