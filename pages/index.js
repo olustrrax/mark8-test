@@ -1,14 +1,14 @@
 import React from "react"
-import { Layout, Card, Upload, Col, Button } from "antd"
+import { Layout, Card, Upload, Col, Button, Row } from "antd"
 import { InboxOutlined,ExclamationCircleFilled } from '@ant-design/icons';
 const { Header } = Layout
 import { useState } from 'react'
 import TableData from "../components/TableData"
 import styled from "styled-components"
-
+import axios from 'axios'
 const Home = () => {
   let title = `Bulk Upload form`
-  const [dataPost, setDataPost] = useState([])
+  let [dataPost, setDataPost] = useState([])
   const [amountSuccess, setASuccess] = useState()
   const [dataInvalid, setDataInvalid] = useState("")
   const ConvertData = async (csv) => {
@@ -46,6 +46,28 @@ const Home = () => {
     else setDataInvalid("")
   }
 
+  const onEditPhoto = async (event, id) => {
+    let formData = new FormData()
+    const file = event.target.files[0]
+    formData.append('photo1', file)
+    const newImg = await axios.post(
+      "/upload", 
+      formData, 
+      {
+        headers: {
+          "Content-type": "multipart/form-data",
+        }
+      }
+    )
+    .then((res) => {
+      return res?.data
+    })
+    dataPost = await dataPost.map((e) => { 
+      if(e.id==id){ e.photo1 = newImg} 
+      return e
+    })
+    setDataPost(dataPost)
+  }
 
   return (
     <>
@@ -86,31 +108,33 @@ const Home = () => {
         </Box>
       </Container>
       {
-        dataPost.length &&
+        dataPost.length ?
         <ContentStyle>
           <ResultUpload>
             <div className="box">
-              <p>
+              <h2>
                 {amountSuccess}
-              </p>
+              </h2>
             </div>
-            <h1>listings successfully and Ready to published</h1>
-            <div style={{ justifyContent: "flex-end", width: "70%", }}>
-              {/* <Col> */}
-                <img style={{}} src="/icons/update.png"/> <p style={{color: "#0089FF"}}>Update data</p>
-              {/* </Col> */}
-              {/* <Col> */}
-              <img src="/icons/open_in_browser.png" />
-              {/* </Col> */}
-              {/* <Col> */}
-              <p style={{color: "#A6AAB4"}}>Published</p>
-              {/* </Col> */}
-            </div>
+            <h2 className="list">listings successfully and Ready to published</h2>
+            <Row display="flex" justifycontent="flex-end" >
+              <div style={{ margin: "auto", display: "flex"}} >
+                <img src="/icons/update.png"/> <p className="update">Update data</p>
+              </div>
+              <div style={{ margin: "auto 2vw"}}>
+                <img src="/icons/open_in_browser.png" />
+              </div>
+              <div style={{ margin: "auto"}}>
+                <p style={{margin : "auto 1vw", color: "#A6AAB4"}}>Published</p>
+              </div>
+            </Row>
           </ResultUpload>
           <TableData
+            editPhoto={onEditPhoto}
             rows={dataPost}
           />
         </ContentStyle>
+        : ""
       }
     </>
   )
@@ -119,29 +143,30 @@ const Home = () => {
 export default Home
 
 const csvToArray = (text) => {
-  let row = [], c = 0, i=0; ans = '', res = [];
-  for(d of text){
+  let row = [], c = 0, i=0, ans = '', res = [];
+  for(let d of text){
     if(d ===',' && !c){
       row.push(ans)
-      ans = d = ''
+      ans = d = '';
     }
     else if(d==='"'){
-      if(!c) c = 1; else c = 0
-      d = ''
+      if(!c) c = 1; else c = 0;
+      d = '';
     }
-    if((text[++i] === undefined || '\n' === d || '\r' === d ) && !c ){
-      row.push(ans)
-      res.push(row)
-      d = ans=''; row =[]; c = 0
+    else if((++i === text.length || '\n' === d || '\r' === d ) && !c && row.length){
+      row.push(ans); res.push(row);
+      d = ans ='';
+      row = []; c = 0;
     } 
-    ans+=d
+    ans+=d;
   }
+  res.push(row)
   return res
 }
 
 const ResultUpload = styled.div`
   display: flex;
-  width: 1920px;
+  width: auto;
   height: 88px;
   left: 0px;
   top: 0px;
@@ -155,28 +180,23 @@ const ResultUpload = styled.div`
   box-sizing: border-box;
   div.box{
     background: #F3F5F8;
-    width: 83px;
     height: 88px;
     display: flex;
   }
-  div.box > p{
-    font-size: 24px;
-    color: #002240;
-    margin: auto;
-  }
-  div > img {
-    width: 20px;
-    height: 20px;
-    margin: 1.8vw 2vw;
-    right: 20vw;
-    position: absolute;
-  }
-  h1{
+  p.update{
+    color: #0089FF;
     margin: auto 1vw;
+    line-height: 0;
+  }
+  h2{
+    margin: auto 2vw;
+  }
+  h2.list{
+    width: 70%;
   }
 `
 const ButtonUpload = styled(Button)`
-  width: 643px;
+  width: 30vw;
   height: 104px;
   left: 0px;
 
@@ -190,8 +210,8 @@ const ButtonUpload = styled(Button)`
   border-radius: 6px;
 `
 const ContentStyle = styled.div`
-  width: 1920px;
-  height: 88px;
+  width: auto;
+  height: auto;
   top: 0px;
   margin: 2vw 0;
   /* bg card */
@@ -203,7 +223,7 @@ const ContentStyle = styled.div`
   box-sizing: border-box;
 `
 const Box = styled(Card)`
-  width: 1019px;
+  max-width: 1019px;
   height: 296px;
   margin: auto;
   /* bg card */
@@ -222,6 +242,7 @@ const Box = styled(Card)`
 const Container = styled.div`
   min-height: 10vh;
   margin-top: 120px;
+  padding: 0 20vw;
 `
 const HeaderSyle = styled(Header)`
   width: 100%;
@@ -236,6 +257,6 @@ const Logo = styled.img`
   position: absolute;
   width: 90px;
   height: 31.76px;
-  left: 448px;
+  left: 20vw;
   top: 12.18px;
 `
