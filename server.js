@@ -8,10 +8,10 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 
 let storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, 'public/upload/')
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`)
   }
 })

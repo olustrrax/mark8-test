@@ -1,6 +1,6 @@
 
-import { Layout, Card, Upload, message, Badge, Table, Popover, Tag } from "antd"
-import { InboxOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { Table, Popover, Tag } from "antd"
+import {  CaretDownOutlined } from '@ant-design/icons';
 import { useState, useEffect } from "react"
 import styled from "styled-components"
 
