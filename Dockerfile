@@ -11,6 +11,6 @@ RUN npm install
 
 ADD . /usr/src/app
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "prod"]
 
 EXPOSE 3000
