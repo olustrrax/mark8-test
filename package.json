@@ -6,9 +6,8 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "dev": "node server",
     "build": "next build",
-    "start": "next start",
+    "start": "node server",
     "export": "next export",
     "prod": "npm run build && npm run start"
   },

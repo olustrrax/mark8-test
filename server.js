@@ -3,7 +3,7 @@ const next = require('next')
 const multer = require('multer')
 const fs = require('fs')
 const port = process.env.PORT || 8080
-const dev = 'develop'
+const dev = process.env.NODE_ENV !== "production"
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
@@ -45,6 +45,6 @@ app.prepare()
     })
     server.listen(port, (err) => {
       if (err) throw err
-      console.log(`> Ready on http://localhost:${port}`)
+      console.log(`> Ready dev ${dev} on http://localhost:${port}`)
     })
 })
