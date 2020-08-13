@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "node server",
     "export": "next export",
-    "prod": "npm run build && npm run start"
+    "prod": "npm run start"
   },
   "dependencies": {
     "@ant-design/icons": "^4.2.1",

@@ -6,5 +6,7 @@ services:
     build: .
     ports: 
       - "3000"
+    # volumes:
+    #   - /docker/volumes/mark8-test/web/uploads:/usr/src/app/public/uploads
     environment:
       NODE_ENV: production
